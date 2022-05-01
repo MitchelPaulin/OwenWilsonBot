@@ -56,10 +56,10 @@ async def ow(context):
 
         # grab user's voice channel
         channel = voice_channel.name
-        await context.send('User is in channel: ' + channel)
         # create StreamPlayer
         vc = await voice_channel.connect()
         vc.play(discord.FFmpegPCMAudio('wilson.mp3'), after=lambda e: print('done', e))
+        await context.send('Wow!')
         while vc.is_playing():
             await asyncio.sleep(1)
         # disconnect after the player has finished
