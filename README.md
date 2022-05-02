@@ -1,7 +1,7 @@
 # Wow yeah okay
 
 <p align="center">
-  <img src="owen.jpeg" />
+  <img src="owen.jpeg" width="300" />
 </p>
 
 
