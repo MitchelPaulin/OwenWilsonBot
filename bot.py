@@ -9,9 +9,17 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='!')
 
+
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+
+    # load a new clip in case one isn't there already
+    try:
+        clip = get_audio_owen_wilson_clip()
+        download_audio_file(clip)
+    except:
+        print("Something went wrong getting an owen wilson clip")
 
 
 def get_audio_owen_wilson_clip():
@@ -38,35 +46,45 @@ def download_audio_file(url):
     description='Wow',
     pass_context=True,
 )
-async def ow(context):
+async def wow(context):
 
     # grab the user who sent the command
     user = context.message.author
     voice_channel = user.voice.channel
-    channel = None
+
     # only play music if user is in a voice channel
     if voice_channel != None:
 
-        # get the clip info
-        try:
-            clip = get_audio_owen_wilson_clip()
-            download_audio_file(clip)
-        except:
-            print("Something went wrong getting an owen wilson clip")
-
-        # grab user's voice channel
-        channel = voice_channel.name
         # create StreamPlayer
-        vc = await voice_channel.connect()
-        vc.play(discord.FFmpegPCMAudio('wilson.mp3'), after=lambda e: print('done', e))
+        try:
+            vc = await voice_channel.connect()  
+        except:
+            print("Could not connect to voice")
+            return
+
+        # wait some time after connecting to the channel to play the clip
+        await asyncio.sleep(1)
+
+        vc.play(discord.FFmpegPCMAudio('wilson.mp3'),
+                after=lambda e: print('done', e))
         await context.send('Wow!')
+
+        # spin while audio is playing
         while vc.is_playing():
             await asyncio.sleep(1)
+
         # disconnect after the player has finished
-        vc.stop()
+        await asyncio.sleep(1)
         await vc.disconnect()
     else:
         await context.send('User is not in a channel.')
+
+    # refresh clip
+    try:
+        clip = get_audio_owen_wilson_clip()
+        download_audio_file(clip)
+    except:
+        print("Something went wrong getting an owen wilson clip")
 
 
 bot.run(TOKEN)
